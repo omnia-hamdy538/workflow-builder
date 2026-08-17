@@ -44,7 +44,6 @@ export const initialEdges = [
     id: "e1-2",
     source: "1",
     target: "2",
-    label: "Send",
     animated: true,
     style: {
       stroke: "#60a5fa",
@@ -55,7 +54,6 @@ export const initialEdges = [
     id: "e2-3",
     source: "2",
     target: "3",
-    label: "Process",
     animated: true,
     style: {
       stroke: "#a78bfa",
@@ -66,7 +64,6 @@ export const initialEdges = [
     id: "e3-4",
     source: "3",
     target: "4",
-    label: "True",
     animated: true,
     style: {
       stroke: "#4ade80",

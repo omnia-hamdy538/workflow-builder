@@ -8,7 +8,7 @@ import {
   useEdgesState,
 } from "@xyflow/react";
 
-import { useCallback, useState } from "react";
+import {  useEffect, useState } from "react";
 
 import "@xyflow/react/dist/style.css";
 
@@ -16,6 +16,7 @@ import CustomNode from "./components/CustomNode";
 import JsonModal from "./components/JsonModal";
 import NodeDetails from "./components/NodeDetails";
 import FlowToolbar from "./components/FlowToolbar";
+import AddNodeModal from "./components/AddNodeModal";
 
 import {
   initialNodes,
@@ -27,29 +28,82 @@ const nodeTypes = {
 };
 
 function App() {
-  const [selectedNode, setSelectedNode] = useState(null);
-  const [jsonData, setJsonData] = useState("");
-
-  const [nodes, setNodes, onNodesChange] =
-    useNodesState(initialNodes);
-
-  const [edges, setEdges, onEdgesChange] =
-    useEdgesState(initialEdges);
-
-  const onConnect = useCallback(
-    (params) => {
-      setEdges((currentEdges) =>
-        addEdge(params, currentEdges)
-      );
-    },
-    [setEdges]
+  const savedNodes = localStorage.getItem(
+    "workflow-nodes"
   );
 
-  const onNodeClick = useCallback((event, node) => {
-    setSelectedNode(node);
-  }, []);
+  const savedEdges = localStorage.getItem(
+    "workflow-edges"
+  );
 
-  const showJson = useCallback(() => {
+  const [selectedNode, setSelectedNode] =
+    useState(null);
+
+  const [jsonData, setJsonData] =
+    useState("");
+
+  const [nodes, setNodes, onNodesChange] =
+    useNodesState(
+      savedNodes
+        ? JSON.parse(savedNodes)
+        : initialNodes
+    );
+
+  const [edges, setEdges, onEdgesChange] =
+    useEdgesState(
+      savedEdges
+        ? JSON.parse(savedEdges)
+        : initialEdges
+    );
+
+  const [isAddModalOpen, setIsAddModalOpen] =
+    useState(false);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "workflow-nodes",
+      JSON.stringify(nodes)
+    );
+  }, [nodes]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "workflow-edges",
+      JSON.stringify(edges)
+    );
+  }, [edges]);
+
+  const addNode = (name, color) => {
+    const newNode = {
+      id: `${Date.now()}`,
+      type: "custom",
+      position: {
+        x: 300,
+        y: 300,
+      },
+      data: {
+        label: name,
+        color,
+      },
+    };
+
+    setNodes((currentNodes) => [
+      ...currentNodes,
+      newNode,
+    ]);
+  };
+
+const onConnect = (params) => {
+  setEdges((currentEdges) =>
+    addEdge(params, currentEdges)
+  );
+};
+
+const onNodeClick = (event, node) => {
+  setSelectedNode(node);
+};
+
+  const showJson = () => {
     const workflow = {
       nodes,
       edges,
@@ -58,7 +112,7 @@ function App() {
     setJsonData(
       JSON.stringify(workflow, null, 2)
     );
-  }, [nodes, edges]);
+  };
 
   const closeNodeDetails = () => {
     setSelectedNode(null);
@@ -70,11 +124,24 @@ function App() {
 
   return (
     <div className="fixed inset-0 h-full w-full overflow-hidden bg-gray-900">
-      <FlowToolbar onShowJson={showJson} />
+      <FlowToolbar
+        onShowJson={showJson}
+        onAddNode={() =>
+          setIsAddModalOpen(true)
+        }
+      />
 
       <JsonModal
         jsonData={jsonData}
         onClose={closeJsonModal}
+      />
+
+      <AddNodeModal
+        isOpen={isAddModalOpen}
+        onClose={() =>
+          setIsAddModalOpen(false)
+        }
+        onAddNode={addNode}
       />
 
       <NodeDetails
@@ -105,7 +172,12 @@ function App() {
         <MiniMap
           zoomable
           pannable
-          className="!rounded-lg !border !border-gray-700 !bg-gray-800"
+          className="
+            !rounded-lg
+            !border
+            !border-gray-700
+            !bg-gray-800
+          "
         />
       </ReactFlow>
     </div>
@@ -113,7 +185,6 @@ function App() {
 }
 
 export default App;
-
 
 
 
