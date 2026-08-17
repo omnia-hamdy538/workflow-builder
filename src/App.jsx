@@ -1,4 +1,3 @@
-
 import {
   ReactFlow,
   Background,
@@ -23,10 +22,10 @@ import {
   initialEdges,
 } from "./data/workflowData";
 
-
 const nodeTypes = {
   custom: CustomNode,
 };
+
 function App() {
   const [selectedNode, setSelectedNode] = useState(null);
   const [jsonData, setJsonData] = useState("");
@@ -36,7 +35,6 @@ function App() {
 
   const [edges, setEdges, onEdgesChange] =
     useEdgesState(initialEdges);
-
 
   const onConnect = useCallback(
     (params) => {
@@ -70,21 +68,9 @@ function App() {
     setJsonData("");
   };
 
-
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        width: "100%",
-        height: "100%",
-        background: "#111827",
-        overflow: "hidden",
-      }}
-    >
-      <FlowToolbar
-        onShowJson={showJson}
-      />
+    <div className="fixed inset-0 h-full w-full overflow-hidden bg-gray-900">
+      <FlowToolbar onShowJson={showJson} />
 
       <JsonModal
         jsonData={jsonData}
@@ -119,11 +105,7 @@ function App() {
         <MiniMap
           zoomable
           pannable
-          style={{
-            background: "#1f2937",
-            border: "1px solid #374151",
-            borderRadius: "8px",
-          }}
+          className="!rounded-lg !border !border-gray-700 !bg-gray-800"
         />
       </ReactFlow>
     </div>
@@ -131,7 +113,6 @@ function App() {
 }
 
 export default App;
-
 
 
 
